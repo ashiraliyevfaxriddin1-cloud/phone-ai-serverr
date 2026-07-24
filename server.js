@@ -7,10 +7,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Server ishlayotganini tekshirish
+app.get("/", (req, res) => {
+  res.send("Phone AI Server ishlayapti!");
+});
+
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// AI chat
 app.post("/chat", async (req, res) => {
   try {
     const message = req.body.message;
@@ -21,12 +27,12 @@ app.post("/chat", async (req, res) => {
       });
     }
 
-    const response = await client.chat.completions.create({
+    const completion = await client.chat.completions.create({
       model: "gpt-4.1-mini",
       messages: [
         {
           role: "system",
-          content: "Sen foydali va muloyim sun'iy intellekt yordamchisisan. Har doim o'zbek tilida javob ber."
+          content: "Sen foydali AI yordamchisisan. Har doim o'zbek tilida javob ber."
         },
         {
           role: "user",
@@ -36,11 +42,11 @@ app.post("/chat", async (req, res) => {
     });
 
     res.json({
-      answer: response.choices[0].message.content
+      answer: completion.choices[0].message.content
     });
 
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
 
     res.status(500).json({
       answer: "AI serverda xatolik yuz berdi."
@@ -48,8 +54,8 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server ${PORT} portda ishga tushdi`);
 });
